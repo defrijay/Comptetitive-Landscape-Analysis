@@ -8,8 +8,7 @@
 ![NLP](https://img.shields.io/badge/NLP-VADER_Sentiment-8A2BE2?style=flat)
 ![Notebooks](https://img.shields.io/badge/Notebooks-6_pipeline_stages-F37626?style=flat&logo=jupyter)
 ![Status](https://img.shields.io/badge/Status-Completed-success?style=flat)
-
----
+![Looker Studio](https://img.shields.io/badge/Looker_Studio-Dashboard-4285F4?style=flat&logo=google&logoColor=white)
 
 ## 📌 TL;DR
 
@@ -392,6 +391,7 @@ jupyter>=1.0
 ## 📬 Contact
 
 **Defrizal Yahdiyan Risyad**
+
 Final-year Computer Science · Universitas Pendidikan Indonesia
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-defrizalyr-0A66C2?style=flat&logo=linkedin)](https://linkedin.com/in/defrizalyr)
