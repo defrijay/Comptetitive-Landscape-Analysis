@@ -7,7 +7,7 @@
 ![Looker Studio](https://img.shields.io/badge/Looker_Studio-Dashboard-4285F4?style=flat&logo=google&logoColor=white)
 ![NLP](https://img.shields.io/badge/NLP-IndoBERT_·_VADER-8A2BE2?style=flat)
 ![Survey](https://img.shields.io/badge/Survey-150%2B_Respondents-00A67E?style=flat)
-![Status](https://img.shields.io/badge/Status-Completed-success?style=flat)
+![Status](https://img.shields.io/badge/Status-Completed-ongoing?style=flat)
 
 ---
 
