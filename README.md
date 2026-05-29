@@ -1,43 +1,42 @@
 # 🛵 Grab vs Gojek vs Maxim vs inDrive — Competitive Landscape Analysis
 
 > **Portfolio Project 01 · Market Research & Consumer Insight**
-> Analisis kompetitif 4 platform ride-hailing terbesar di Indonesia menggunakan survei primer, sentiment analysis, dan social listening, mengidentifikasi positioning gap dan peluang strategis Grab di tengah persaingan dengan incumbents dan challengers berbasis harga.
+> Analisis kompetitif 4 platform ride-hailing terbesar di Indonesia berbasis **100.000 Google Play reviews** nyata menggunakan NLP, sentiment analysis VADER, keyword-based churn detection, dan feature pain point matrix untuk mengidentifikasi positioning gap dan peluang strategis Grab.
 
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat&logo=python&logoColor=white)
-![Looker Studio](https://img.shields.io/badge/Looker_Studio-Dashboard-4285F4?style=flat&logo=google&logoColor=white)
-![NLP](https://img.shields.io/badge/NLP-IndoBERT_·_VADER-8A2BE2?style=flat)
-![Survey](https://img.shields.io/badge/Survey-150%2B_Respondents-00A67E?style=flat)
+![Reviews](https://img.shields.io/badge/Reviews-100K_Google_Play-34A853?style=flat&logo=googleplay&logoColor=white)
+![NLP](https://img.shields.io/badge/NLP-VADER_Sentiment-8A2BE2?style=flat)
+![Notebooks](https://img.shields.io/badge/Notebooks-6_pipeline_stages-F37626?style=flat&logo=jupyter)
 ![Status](https://img.shields.io/badge/Status-Completed-success?style=flat)
 
 ---
 
-## 📌 Executive Summary
+## 📌 TL;DR
 
 | | |
 |---|---|
-| **Apa yang dilakukan** | Analisis kompetitif 4 platform ride-hailing (Grab, Gojek, Maxim, inDrive) di 5 kota Indonesia menggunakan survei primer (n=150+), sentiment analysis 4.000+ app review, dan Twitter/X social listening |
-| **Metode utama** | NPS scoring, 7-dimensi feature rating, VADER + IndoBERT sentiment, LDA topic modeling |
-| **Temuan terkuat** | Grab unggul di reliability dan ekosistem superapp, namun terancam oleh Maxim & inDrive yang agresif di segmen price-sensitive kota tier 2–3 |
-| **Output bisnis** | Feature gap matrix + 4 rekomendasi strategis dengan estimasi dampak terukur |
-| **Tools** | Python · Google Forms · Looker Studio · google-play-scraper · HuggingFace |
+| **Apa yang dilakukan** | Scraping 25.000 review per platform (100.000 total) dari Google Play Store, cleaning hingga 66.878 review bersih, EDA 6 analisis, VADER sentiment scoring, dan competitive synthesis dengan 5 rekomendasi strategis |
+| **Sumber data** | Google Play Store (real data, bukan simulasi) · `google-play-scraper` · bahasa Indonesia · `lang='id'`, `country='id'` |
+| **Metode utama** | NPS Proxy dari star rating, VADER sentiment analysis, keyword-based churn signal detection, feature pain point matrix, developer reply rate analysis |
+| **Temuan terkuat** | Maxim memimpin kepuasan pengguna (avg rating 4.27, NPS +60.1); Gojek paling rendah (avg 3.11, NPS -0.1); churn risk tertinggi di Gojek (5.65%); Grab lemah di voucher/promo dan response time |
+| **Output bisnis** | 5 rekomendasi strategis IF-THEN-IMPACT + `strategic_recommendations.csv` + 19 visualisasi tersimpan |
+| **Tools** | Python · google-play-scraper · VADER · pandas · matplotlib · seaborn · Jupyter |
 | **Relevansi ke Grab GIP** | Langsung mencerminkan tugas role: *"research on products and the market to support new and ongoing programs"* |
 
 ---
 
 ## 🎯 Background
 
-Pasar ride-hailing Indonesia merupakan salah satu yang paling kompetitif dan terfragmentasi di Asia Tenggara. Empat pemain utama saat ini menempati positioning yang sangat berbeda:
+Industri ride-hailing Indonesia merupakan salah satu yang paling kompetitif di Asia Tenggara. Empat pemain utama menempati positioning yang sangat berbeda:
 
-| Platform | Asal | Diferensiasi Utama | Kekuatan Pasar |
+| Platform | Asal | Diferensiasi Utama | App ID Google Play |
 |---|---|---|---|
-| **Grab** | Singapura | Superapp ekosistem lengkap (ride, food, payment) | Dominan di kota besar, loyal users |
-| **Gojek** | Indonesia | Brand lokal kuat, GoPay, integrasi KRL | Market share tertinggi (82.6% pengguna) |
-| **Maxim** | Rusia | Tarif sangat murah, ekspansi kota tier 2–3 | Tumbuh cepat di luar Jabodetabek |
-| **inDrive** | Rusia | Model negosiasi tarif driver-penumpang, komisi < 10% | Price-sensitive commuters, driver-friendly |
+| **Grab** | Singapura | Superapp ekosistem lengkap (ride, food, payment) | `com.grabtaxi.passenger` |
+| **Gojek** | Indonesia | Brand lokal kuat, GoPay, integrasi ekosistem | `com.gojek.app` |
+| **Maxim** | Rusia | Tarif murah, ekspansi kota tier 2–3 | `com.taxsee.taxsee` |
+| **inDrive** | Rusia | Negosiasi tarif driver-penumpang, komisi rendah | `sinet.startup.inDriver` |
 
-Dinamika ini memunculkan pertanyaan kritis: di tengah tekanan harga dari Maxim dan inDrive, serta dominasi brand Gojek secara lokal, **di mana posisi kompetitif Grab yang paling defensible** — dan dimensi apa yang harus diprioritaskan untuk mempertahankan loyalitas pengguna?
-
-Proyek ini menjawab pertanyaan tersebut melalui pendekatan mixed-method yang menggabungkan data kuantitatif survei, sentiment analysis app review, dan analisis media sosial.
+Proyek ini menjawab pertanyaan kritis: **di mana posisi kompetitif Grab yang paling defensible**, dan dimensi produk apa yang harus diprioritaskan untuk mempertahankan loyalitas pengguna — berdasarkan bukti langsung dari 66.878 review pengguna nyata.
 
 ---
 
@@ -49,200 +48,214 @@ Proyek ini menjawab pertanyaan tersebut melalui pendekatan mixed-method yang men
 
 | # | Research Question |
 |---|---|
-| RQ1 | Pada dimensi mana (harga, reliability, UX, driver quality, ekosistem layanan, program reward) Grab unggul atau tertinggal dari ketiga kompetitor? |
-| RQ2 | Apa trigger utama yang menyebabkan pengguna berpindah ke Maxim atau inDrive, dan segmen pengguna mana yang paling rentan? |
-| RQ3 | Bagaimana sentimen publik terhadap masing-masing platform di app store dan media sosial, dan isu apa yang paling sering dibicarakan? |
-| RQ4 | Apakah model negosiasi tarif inDrive dan tarif flat Maxim menjadi ancaman nyata terhadap basis pengguna Grab, atau hanya menarik segmen berbeda? |
-| RQ5 | Rekomendasi produk dan strategi apa yang memberikan dampak terbesar untuk memperkuat posisi Grab terhadap challenger berbasis harga? |
+| RQ1 | Bagaimana perbandingan rata-rata rating dan NPS proxy keempat platform berdasarkan 66.878 review nyata? |
+| RQ2 | Apa topik pain point dan praise yang paling sering muncul di masing-masing platform? |
+| RQ3 | Bagaimana tren sentimen bulanan berubah, dan platform mana yang paling fluktuatif? |
+| RQ4 | Platform mana yang paling aktif merespons ulasan, dan seberapa cepat? |
+| RQ5 | Apa churn risk signal tertinggi per platform, dan trigger switching apa yang paling dominan? |
+| RQ6 | Pada dimensi produk mana (harga, driver, app performance, CS) Grab memiliki kelemahan terbesar vs kompetitor? |
 
 ---
 
 ## 💡 Key Findings
 
-### 1. Grab dan Gojek dominan, Maxim & inDrive tumbuh dari bawah
-> Grab dan Gojek masih memimpin di kota besar berdasarkan survei, namun **Maxim dan inDrive menunjukkan traksi signifikan di kota tier 2–3** (Bandung, Medan, Semarang). 31% responden dari kota-kota tersebut menyebut Maxim sebagai platform utama untuk perjalanan pendek karena tarif yang 30–45% lebih murah.
+### 1. Maxim memimpin kepuasan, Gojek paling rendah
+> Berdasarkan analisis 66.878 review bersih, **Maxim unggul di kedua metrik kepuasan**: avg rating tertinggi **(4.27)** dan NPS Proxy tertinggi **(+60.1)**. Gojek berada di posisi terbawah dengan avg rating **(3.11)** dan NPS Proxy **(−0.1)** — mengindikasikan lebih banyak detractor daripada promotor. Grab dan inDrive berada di tengah dengan rating serupa (3.33–3.37) dan NPS positif tipis (+11.1 hingga +13.0).
 
-### 2. Harga adalah satu-satunya keunggulan Maxim & inDrive
-> Analisis feature rating menunjukkan Maxim dan inDrive hanya unggul di 1 dari 7 dimensi: **harga/tarif**. Di semua dimensi lain — reliability, app UX, keamanan, ekosistem layanan, program reward — Grab dan Gojek memimpin secara konsisten. Ini berarti ancaman mereka bersifat *price-driven*, bukan *experience-driven*.
+### 2. VADER terbatas untuk teks Indonesia — star rating lebih andal
+> VADER sentiment analysis mengklasifikasikan **85,3% review sebagai neutral** karena keterbatasan lexicon bahasa Inggris pada teks Indonesia — sebuah limitasi yang didokumentasikan secara transparan. Maxim memiliki compound score tertinggi (0.039) dan negative rate terendah (2.1%); Gojek memiliki negative rate tertinggi (7.9%). Oleh karena itu, analisis kompetitif utama bersandar pada **star rating + keyword analysis** sebagai sinyal yang lebih valid.
 
-### 3. Model negosiasi inDrive menarik segmen driver, bukan rider
-> Dari sisi rider, model negosiasi tarif inDrive justru dipersepsikan sebagai **sumber friction**, bukan keunggulan: 67% responden yang pernah mencoba inDrive menyebut proses tawar-menawar sebagai alasan tidak melanjutkan penggunaan. Ancaman inDrive lebih terasa di sisi supply (driver) dibanding demand (rider).
+### 3. Gojek memiliki churn risk tertinggi, Maxim terendah
+> Keyword-based churn signal detection (kata kunci: *uninstall, pindah, kapok, beralih, mending, pakai aplikasi lain*, dll.) menunjukkan bahwa **Gojek memiliki churn signal rate tertinggi (5.65%)**, diikuti inDrive (5.19%) dan Grab (4.45%). **Maxim hanya 1.77%** — kurang dari setengah kompetitor terdekat. Ini mengkonfirmasi bahwa kepuasan pengguna Maxim bukan sekadar rating tinggi, melainkan loyalitas aktif.
 
-### 4. Ekosistem superapp adalah moat terkuat Grab
-> Pengguna yang menggunakan 3+ layanan Grab (ride + food + payment) memiliki churn rate **4.8x lebih rendah** dari pengguna ride-only. Ini mengkonfirmasi bahwa integrasi ekosistem — bukan harga — adalah diferensiasi yang paling defensible untuk Grab terhadap Maxim dan inDrive.
+### 4. Pricing & voucher adalah pain point terbesar Grab
+> Feature pain point matrix dari notebook competitive synthesis mengidentifikasi bahwa **keluhan terkait harga, ongkir, dan voucher mendominasi review negatif Grab**. Ini adalah P1 priority: mekanisme voucher yang tidak konsisten (tiba-tiba tidak bisa digunakan padahal masa berlaku masih ada) adalah trigger paling sering memicu 1-star review.
 
-### 5. App stability Grab lebih baik dari Gojek, namun driver cancellation masih jadi isu
-> Sentiment analysis menunjukkan keluhan driver cancellation mendominasi review negatif Grab (38% topik negatif) — jauh di atas Gojek (22%), Maxim (15%), dan inDrive (8%). Di luar itu, app stability Grab secara umum dinilai lebih baik dari Gojek berdasarkan rating dan review tren 6 bulan terakhir.
+### 5. Refund & payment issues adalah churn trigger terbesar
+> Analisis churn trigger menunjukkan **refund/payment issues menempati posisi tertinggi** dalam switching intent. Tidak adanya SLA yang jelas untuk proses refund mendorong pengguna Grab aktif beralih ke kompetitor yang proses pembayarannya lebih transparan.
+
+### 6. Maxim mengabaikan review, Grab lambat merespons
+> Developer reply rate analysis mengungkap disparitas besar: **inDrive paling responsif (56.2%)**, diikuti Grab (46.2%) dan Gojek (43.4%). **Maxim hampir tidak merespons sama sekali (0.8%)**. Namun Grab meskipun reply rate-nya baik, memiliki **median response time 5.8 jam** — jauh lebih lambat dari Gojek yang hanya **0.7 jam**. Kecepatan respons Gojek menjadi competitive advantage yang tersembunyi.
 
 ---
 
 ## 👥 Segment Profiles
 
-Berdasarkan survei, pengguna ride-hailing di Indonesia terbagi ke dalam 4 profil berbeda dengan preferensi platform yang berbeda:
+Berdasarkan analisis churn signal dan rating distribution per platform dari 66.878 review bersih:
 
-| Segmen | Proporsi | Karakteristik | Platform Utama | Switching Risk ke Maxim/inDrive |
-|---|---|---|---|---|
-| 🏙️ **Urban Loyalist** | 22% | Kota besar, multi-service, GrabPay/GoPay user, income menengah-atas | Grab atau Gojek (eksklusif) | Rendah — ekosistem lock-in kuat |
-| 💰 **Price Hunter** | 31% | Sensitif harga, sering bandingkan tarif sebelum order, kota tier 2–3 | Mixed — pilih termurah saat itu | Sangat tinggi — aktif pakai Maxim |
-| 🛡️ **Safety-First** | 19% | Perempuan, malam hari, prioritas keamanan driver | Grab atau Gojek | Rendah — tidak mau coba platform baru |
-| 🔄 **Pragmatic Switcher** | 28% | Tidak loyal ke satu platform, pilih berdasarkan promo hari itu | Semua platform bergantian | Sedang — sudah pakai inDrive sesekali |
-
-**Insight kritis:** Price Hunters (31%) adalah segmen yang paling aktif trial Maxim dan inDrive. Namun sebagian besar tetap mempertahankan Grab/Gojek untuk perjalanan penting — mengindikasikan *dual-apping* bukan full switching.
+| Platform | Avg Rating | NPS Proxy | Churn Signal Rate | Reply Rate | Median Reply Time | Profil Pengguna |
+|---|---|---|---|---|---|---|
+| 🟠 **Maxim** | **4.27** | **+60.1** | **1.77%** | 0.8% | N/A | Sangat puas, sangat loyal, rating-dominant positive |
+| 🟢 **Grab** | 3.37 | +13.0 | 4.45% | 46.2% | 5.8 jam | Sedang, terancam oleh voucher/promo issues |
+| 🟣 **inDrive** | 3.33 | +11.1 | 5.19% | **56.2%** | N/A | Sedang, tinggi switching risk, paling responsif |
+| 🔵 **Gojek** | 3.11 | -0.1 | **5.65%** | 43.4% | **0.7 jam** | Paling rendah, churn risk tertinggi, respons cepat |
 
 ---
 
 ## 📊 Recommendations
 
-| # | Temuan yang Mendasari | Rekomendasi | Estimated Impact |
-|---|---|---|---|
-| 1 | Price Hunters aktif dual-app dengan Maxim di kota tier 2–3 | Rancang **"Grab Hemat" tier** dengan tarif kompetitif khusus motor jarak pendek di kota tier 2–3, menggunakan dynamic pricing yang lebih agresif di off-peak hours | Estimasi recovery 25% Price Hunter segment dari dual-app menjadi Grab-primary |
-| 2 | Driver cancellation 38% topik negatif di review Grab | Implementasi **automatic driver penalty system** yang lebih transparan + notifikasi real-time ke rider saat driver cancel — kurangi ambiguitas yang menjadi sumber frustrasi utama | Estimasi penurunan cancellation complaint -40% dalam 3 bulan |
-| 3 | Ekosistem superapp = moat terkuat vs Maxim & inDrive | Perkuat **cross-service bundling**: "Order GrabFood 3x minggu ini, dapat GrabBike gratis 2x" — dorong pengguna ride-only menjadi multi-service | Pengguna multi-service 4.8x lebih tidak mungkin full-switch ke Maxim |
-| 4 | inDrive menarik driver dengan komisi rendah, mengancam supply Grab | Luncurkan **"Grab Driver Loyalty Program"** dengan earning boost untuk driver dengan acceptance rate tinggi — pertahankan supply berkualitas yang menjadi fondasi reliability unggul | Mitigasi driver supply drain yang secara tidak langsung meningkatkan cancellation rate |
+Dihasilkan dari `06_competitive_synthesis.ipynb` → disimpan ke `strategic_recommendations.csv`:
+
+| Prioritas | Temuan (Data-backed) | Aksi yang Direkomendasikan | Expected Impact | KPI |
+|---|---|---|---|---|
+| **P1** | Pricing & ongkir = pain point terbesar di review negatif Grab | Implement **voucher lock mechanism** — voucher harus dijamin hingga expired, tidak bisa ditarik sepihak | Estimasi reduksi 15–20% churn complaint terkait voucher/promo | % review negatif menyebut "voucher"/"promo" |
+| **P1** | Refund/payment issues = churn trigger tertinggi | Enforce **48-hour refund SLA** dengan automated status notification ke user | Kurangi refund-related 1-star reviews ~25% | Median refund resolution time |
+| **P2** | App lag/crash sering disebut; pengguna Maxim memuji kecepatan app | Prioritaskan **app performance optimization untuk mid-range Android (RAM < 3GB)** | Improve NPS Proxy +5 hingga +10 poin untuk segmen budget device | Crash-free session rate; frekuensi kata "lag"/"lemot" |
+| **P2** | Driver cancellation = recurring pain point vs inDrive | Implement **driver penalty escalation** untuk cancellation berulang di hari yang sama | Kurangi cancellation-related reviews ~20% | Cancellation rate per driver |
+| **P3** | CS reply Grab generic dan lambat (5.8 jam median) vs Gojek 0.7 jam | **Personalisasi CS reply template** — hindari copy-paste respons generik | Improve reply sentiment; kurangi follow-up 1-star reviews | Reply thumbs-up count; repeat 1-star rate after reply |
 
 ---
 
 ## 🗂️ Dataset
 
-Proyek ini menggunakan kombinasi **data primer** (survei) dan **data sekunder** (scraping + referensi publik):
-
-### Primary data — Survei (Google Forms)
+### Spesifikasi data yang benar-benar dikumpulkan
 
 | Attribute | Detail |
 |---|---|
-| Jumlah responden | 150+ |
-| Target | Pengguna aktif minimal 1 platform dalam 30 hari terakhir |
-| Metode distribusi | WhatsApp group mahasiswa, komunitas transportasi & daily commuter, media sosial |
-| Durasi pengisian | ~8–10 menit |
-| Kota target | Jakarta, Bandung, Medan, Semarang, Surabaya |
-| Bahasa | Bahasa Indonesia |
+| **Sumber** | Google Play Store (real data) via `google-play-scraper` |
+| **Bahasa** | Indonesia (`lang='id'`, `country='id'`) |
+| **Total raw** | **100.000 reviews** (25.000 per platform) |
+| **Setelah cleaning** | **66.878 reviews** bersih |
+| **Periode** | Hingga Mei 2026 (sorted by newest) |
+| **Format raw** | 4 CSV terpisah per platform di `data/raw/google_play_reviews/` |
+| **Format clean** | `combined_reviews_clean.csv` di `data/clean/` |
 
-**Struktur survei (5 bagian):**
-- **Bagian A:** Screening & profil demografis (kota, usia, frekuensi perjalanan)
-- **Bagian B:** Usage pattern — platform yang digunakan & alasan utama
-- **Bagian C:** Feature rating 7 dimensi per platform yang pernah digunakan (skala 1–5 Likert)
-- **Bagian D:** NPS (0–10) + likelihood mencoba Maxim/inDrive
-- **Bagian E:** Switching trigger — open text + checklist alasan berpindah platform
+> **Catatan:** Apple App Store scraping (cell ke-2 di notebook 01) sudah disiapkan dengan `app-store-scraper` namun **tidak dieksekusi** dalam pipeline final — proyek ini sepenuhnya berbasis data Google Play Store.
 
-### Secondary data — App Store Reviews
+### Kolom raw (9 kolom dari google-play-scraper)
 
-| Sumber | Volume | Periode | Metode |
+| Kolom | Tipe | Deskripsi |
+|---|---|---|
+| `reviewId` | string | ID unik review |
+| `userName` | string | Nama pengguna |
+| `content` | string | Teks review |
+| `score` | int | Rating bintang 1–5 |
+| `thumbsUpCount` | int | Jumlah thumbs up |
+| `reviewCreatedVersion` | string | Versi app saat review ditulis (17.5% null) |
+| `at` | datetime | Timestamp review |
+| `replyContent` | string | Balasan developer (71.1% null) |
+| `repliedAt` | datetime | Timestamp balasan |
+
+### Pipeline cleaning (03_data_cleaning.ipynb)
+
+| Tahap | Sebelum | Sesudah | Keterangan |
 |---|---|---|---|
-| Google Play — Grab | ~1,000 review | 6 bulan terakhir | `google-play-scraper` |
-| Google Play — Gojek | ~1,000 review | 6 bulan terakhir | `google-play-scraper` + Kaggle Gojek dataset |
-| Google Play — Maxim | ~1,000 review | 6 bulan terakhir | `google-play-scraper` |
-| Google Play — inDrive | ~1,000 review | 6 bulan terakhir | `google-play-scraper` |
+| Raw load | 100.000 | 100.000 | 4 platform × 25.000 |
+| Duplicate by `reviewId` | 100.000 | 100.000 | Tidak ada duplikat ID |
+| Duplicate by `content + platform` | 100.000 | **67.037** | 32.963 review teks identik dihapus |
+| Invalid/empty rows | 67.037 | **66.878** | 159 baris null score/at/content < 3 char |
+| **Final clean** | | **66.878** | Siap analisis |
 
-### Secondary data — Referensi publik
+### Kolom tambahan setelah cleaning
 
-| Sumber | Kegunaan |
-|---|---|
-| Mordor Intelligence / 6W Research | Market share & competitive landscape ride-hailing Indonesia 2024 |
-| ResearchGate — Pratiwi et al. (2024) | Riset akademis: strategi promosi digital Gojek, Grab, inDrive, Maxim |
-| UIN Sultan Syarif Kasim Riau (2025) | Sentiment baseline Grab vs Gojek (peer-reviewed, 1.800 review per platform) |
-| Google Trends | Search volume trend 4 platform, 2022–2025 |
-| Similarweb (free tier) | Web traffic & app engagement proxy |
-
-> **Catatan transparansi:** Data survei primer dikumpulkan dengan persetujuan responden. Data app review digunakan sesuai terms of service Google Play. Tidak ada data internal atau proprietary dari platform manapun yang digunakan dalam proyek ini.
+Kolom-kolom berikut di-generate selama cleaning dan EDA:
+`content_clean`, `content_normalized` (lowercase, hapus URL, normalize whitespace), `review_year`, `review_month`, `review_length`, `sentiment_label` (proxy dari star rating: 4–5 = positive, 3 = neutral, 1–2 = negative), `has_reply`, `churn_signal` (keyword-based binary flag), `vader_label`, `vader_compound`
 
 ---
 
 ## ⚙️ Pipeline Overview
 
 ```
-┌──────────────────────────────────────────────────┐
-│              DATA COLLECTION LAYER                │
-│  Google Forms Survey  +  App Store Scraping (4x) │
-│  Twitter/X snscrape   +  Public Reports & Papers  │
-└─────────────────────┬────────────────────────────┘
-                      │
-                      ▼
-┌──────────────────────────────────────────────────┐
-│              PREPROCESSING LAYER                  │
-│  Slang normalization (gak→tidak, dll)             │
-│  Duplicate & short review removal (< 10 kata)     │
-│  Survey response validation & encoding            │
-│  Language detection — split ID vs EN text         │
-└─────────────────────┬────────────────────────────┘
-                      │
-                      ▼
-┌──────────────────────────────────────────────────────────┐
-│                    ANALYSIS LAYER                         │
-│                                                           │
-│  ┌──────────────────────┐  ┌───────────────────────────┐ │
-│  │   Survey Analysis    │  │    Sentiment Analysis     │ │
-│  │  · NPS per platform  │  │  · VADER (English text)   │ │
-│  │  · 7-dim feature     │  │  · IndoBERT (Indonesian)  │ │
-│  │    rating heatmap    │  │  · LDA topic modeling     │ │
-│  │  · Switching trigger │  │  · Word cloud per platform│ │
-│  │  · Segment profiling │  │  · Sentiment trend 6 bln  │ │
-│  └──────────┬───────────┘  └─────────────┬─────────────┘ │
-│             └──────────────┬─────────────┘               │
-│                            ▼                              │
-│             ┌──────────────────────────┐                 │
-│             │  Competitive Synthesis   │                 │
-│             │  · 7-dim radar chart     │                 │
-│             │  · Feature gap matrix    │                 │
-│             │  · Platform scorecard    │                 │
-│             └──────────────────────────┘                 │
-└──────────────────────┬───────────────────────────────────┘
-                       │
-                       ▼
-┌──────────────────────────────────────────────────┐
-│                  OUTPUT LAYER                     │
-│  Executive Report PDF  ·  Looker Studio Dashboard │
-│  Companion Slide Deck  ·  GitHub Repo             │
-└──────────────────────────────────────────────────┘
+📥 01_data_collection.ipynb
+   └── Scraping 25.000 review × 4 platform → data/raw/google_play_reviews/
+          (Grab, Gojek, Maxim, inDrive · lang=id · sort=NEWEST · batch 1.000)
+       └── delay 3s/batch, 5s/platform untuk hindari IP block
+
+📊 02_data_understanding.ipynb
+   └── Load & merge 100.000 rows × 10 cols
+   └── Check duplicates, missing values, score distribution
+   └── Monthly volume trend, review length distribution
+   └── 5 visualisasi → reports/figures/02_*.png
+
+🧹 03_data_cleaning.ipynb
+   └── Drop 32.963 same-text duplicates → 67.037
+   └── Drop 159 invalid rows → 66.878 final
+   └── Rename camelCase → snake_case
+   └── Normalize text (lowercase, hapus URL, collapse repetition, preserve emoji)
+   └── Tambah: sentiment_label, temporal features, review_length
+   └── Output: data/clean/combined_reviews_clean.csv
+
+🔍 04_EDA.ipynb
+   └── Avg Rating + NPS Proxy per platform
+   └── Stacked rating distribution (100% bar)
+   └── Monthly rating trend (line chart)
+   └── Top keywords extraction (pain points vs praise)
+   └── Developer reply rate + median response time
+   └── Keyword-based churn signal detection
+   └── 7 visualisasi → reports/figures/04_*.png
+
+🧠 05_sentiment_analysis.ipynb
+   └── VADER scoring (compound -1 to +1)
+   └── Classification: positive ≥0.05, negative ≤-0.05, neutral
+   └── Per-platform VADER scorecard → data/clean/vader_scorecard.csv
+   └── Sentiment trend over time (monthly)
+   └── VADER vs star rating heatmap (cross-validation)
+   └── 3 visualisasi → reports/figures/05_*.png
+
+🏆 06_competitive_synthesis.ipynb
+   └── NPS Proxy + aspect mention mapping
+   └── 3-metric competitive summary dashboard
+   └── Feature pain point matrix (pricing, app, driver, CS, refund)
+   └── Feature health radar chart
+   └── Churn signal analysis + switching triggers
+   └── 5 strategic recommendations → data/clean/strategic_recommendations.csv
+   └── 4 visualisasi → reports/figures/06_*.png
+   └── Total: 19 figures confirmed
 ```
 
 ---
 
 ## 📓 Notebooks
 
-| Notebook | Deskripsi | Output utama |
-|---|---|---|
-| `01_data_collection.ipynb` | Scraping Google Play reviews untuk 4 platform menggunakan `google-play-scraper` | `grab_reviews.csv`, `gojek_reviews.csv`, `maxim_reviews.csv`, `indrive_reviews.csv` |
-| `02_survey_analysis.ipynb` | Analisis survei primer: NPS, feature rating, switching trigger, segment profiling | NPS scorecard, radar chart 4 platform, segment distribution |
-| `03_sentiment_analysis.ipynb` | Text cleaning → VADER/IndoBERT → LDA topic modeling → word cloud per platform | `sentiment_scores.csv`, topic clusters, sentiment heatmap |
-| `04_competitive_synthesis.ipynb` | Integrasi semua sumber: feature gap matrix, competitive scorecard, rekomendasi | Final gap matrix, competitive heatmap, executive tables |
+| Notebook | Deskripsi | Input | Output utama |
+|---|---|---|---|
+| `01_data_collection.ipynb` | Scraping 25.000 review per platform via `google-play-scraper` dengan pagination token dan rate limiting | Google Play Store API | `data/raw/google_play_reviews/*.csv` (4 file) |
+| `02_data_understanding.ipynb` | Memahami struktur, kualitas, dan distribusi data sebelum cleaning (12 segmen analisis) | `data/raw/*.csv` | 5 visualisasi: missing values, monthly volume, review length, score distribution, reviews per platform |
+| `03_data_cleaning.ipynb` | Deduplikasi 2 pass, rename kolom, type casting, text normalization, feature engineering | `data/raw/*.csv` | `data/clean/combined_reviews_clean.csv` (66.878 baris) |
+| `04_EDA.ipynb` | 6 analisis EDA: avg rating + NPS proxy, stacked distribution, trend bulanan, keyword extraction, reply stats, churn signal | `combined_reviews_clean.csv` | 7 PNG figures + kolom `churn_signal` |
+| `05_sentiment_analysis.ipynb` | VADER sentiment scoring, per-platform scorecard, trend over time, cross-validation vs star rating | `combined_reviews_clean.csv` | `vader_scorecard.csv` + 3 PNG figures |
+| `06_competitive_synthesis.ipynb` | Sintesis kompetitif akhir: NPS, pain point matrix, radar chart, churn analysis, 5 IF-THEN-IMPACT recommendations | `combined_reviews_clean.csv` + `vader_scorecard.csv` | `strategic_recommendations.csv` + 4 PNG figures |
 
 ---
 
 ## 🤖 Model Performance
 
-### Sentiment Analysis Accuracy
+### VADER Sentiment Scorecard (per notebook 05)
 
-| Model | Language Target | Approach | Accuracy |
-|---|---|---|---|
-| VADER | English reviews | Lexicon-based | ~78% |
-| IndoBERT (HuggingFace) | Indonesian reviews | Pretrained transformer | ~85% |
-| LDA Topic Model | All text (4 platform) | Unsupervised | Coherence score: 0.54 |
-
-### NPS Hasil Survei — 4 Platform
-
-| Platform | NPS | Promoters | Passives | Detractors | Interpretasi |
+| Platform | Total Reviews | % Positive | % Neutral | % Negative | Avg Compound |
 |---|---|---|---|---|---|
-| Grab | +34 | 52% | 30% | 18% | Positif kuat |
-| Gojek | +29 | 48% | 33% | 19% | Positif |
-| Maxim | +11 | 35% | 41% | 24% | Netral-positif |
-| inDrive | +4 | 31% | 42% | 27% | Netral |
+| Maxim | 14.380 | 10.1% | 87.7% | **2.1%** | **0.039** |
+| Grab | 16.218 | 8.6% | 84.8% | 6.7% | 0.015 |
+| inDrive | 17.979 | 8.0% | 86.2% | 5.8% | 0.014 |
+| Gojek | 18.301 | 9.3% | 82.8% | **7.9%** | 0.014 |
 
-> NPS dihitung sebagai % Promoters (9–10) — % Detractors (0–6). Grab memimpin NPS, namun gap dengan Gojek sempit — mengindikasikan loyalitas yang rentan terhadap pergeseran promosi.
+> **Catatan metodologi:** VADER adalah lexicon berbasis bahasa Inggris. Pada teks Indonesia, ~85% review terklasifikasi neutral karena kata Indonesia tidak ada di lexicon-nya. Hasil ini **valid sebagai baseline komparatif antar platform**, namun tidak representatif untuk analisis sentimen absolut. Analisis utama menggunakan **star rating + keyword-based approach** sebagai complement yang lebih akurat.
+
+### NPS Proxy & Rating Summary (per notebook 04 & 06)
+
+| Platform | Avg Star Rating | NPS Proxy | Churn Signal Rate | Reply Rate |
+|---|---|---|---|---|
+| **Maxim** | **4.27** | **+60.1** | **1.77%** | 0.8% |
+| Grab | 3.37 | +13.0 | 4.45% | 46.2% |
+| inDrive | 3.33 | +11.1 | 5.19% | 56.2% |
+| Gojek | 3.11 | -0.1 | 5.65% | 43.4% |
+
+*NPS Proxy = (% bintang 5) − (% bintang 1–2) × 100. Dihitung dari 66.878 review bersih.*
 
 ---
 
 ## 🛠️ Tech Stack
 
 ```
-Language        Python 3.10+
-Scraping        google-play-scraper, snscrape
-NLP             VADER (vaderSentiment), IndoBERT (transformers · HuggingFace)
-Topic Modeling  gensim (LDA)
-Data            pandas, numpy
-Visualization   matplotlib, seaborn, wordcloud, plotly
-Dashboard       Looker Studio (interactive, shareable link)
-Survey          Google Forms + Google Sheets
-Version control GitHub
+Language         Python 3.10+
+Data Collection  google-play-scraper (pagination token, rate limiting)
+Data Processing  pandas, numpy, re
+NLP/Sentiment    vaderSentiment (VADER)
+Visualization    matplotlib, seaborn
+Text Analysis    collections.Counter (keyword extraction)
+File I/O         pathlib.Path
+Notebook         Jupyter Lab / Jupyter Notebook
+Version Control  GitHub
 ```
 
 ---
@@ -254,35 +267,45 @@ grab-ridehailing-competitive-analysis/
 │
 ├── data/
 │   ├── raw/
-│   │   ├── grab_reviews.csv              # Scraped Google Play reviews — Grab
-│   │   ├── gojek_reviews.csv             # Scraped Google Play reviews — Gojek
-│   │   ├── maxim_reviews.csv             # Scraped Google Play reviews — Maxim
-│   │   ├── indrive_reviews.csv           # Scraped Google Play reviews — inDrive
-│   │   └── survey_raw.csv               # Raw survey responses (150+ respondents)
-│   └── processed/
-│       ├── combined_reviews_clean.csv   # Merged & cleaned reviews (4 platforms)
-│       ├── sentiment_scores.csv         # Sentiment score per review per platform
-│       └── survey_encoded.csv           # Survey data ready for analysis
+│   │   └── google_play_reviews/
+│   │       ├── grab_reviews.csv        # 25.000 rows
+│   │       ├── gojek_reviews.csv       # 25.000 rows
+│   │       ├── maxim_reviews.csv       # 25.000 rows
+│   │       └── indrive_reviews.csv     # 25.000 rows
+│   └── clean/
+│       ├── combined_reviews_clean.csv  # 66.878 rows (final clean)
+│       ├── vader_scorecard.csv         # Sentiment summary per platform
+│       └── strategic_recommendations.csv  # 5 IF-THEN-IMPACT actions
 │
 ├── notebooks/
 │   ├── 01_data_collection.ipynb
-│   ├── 02_survey_analysis.ipynb
-│   ├── 03_sentiment_analysis.ipynb
-│   └── 04_competitive_synthesis.ipynb
+│   ├── 02_data_understanding.ipynb
+│   ├── 03_data_cleaning.ipynb
+│   ├── 04_EDA.ipynb
+│   ├── 05_sentiment_analysis.ipynb
+│   └── 06_competitive_synthesis.ipynb
 │
-├── outputs/
-│   ├── figures/
-│   │   ├── nps_scorecard_4platforms.png
-│   │   ├── radar_chart_7dimensions.png       # 4 platform overlay
-│   │   ├── sentiment_heatmap_platform_topic.png
-│   │   ├── wordcloud_grab.png
-│   │   ├── wordcloud_gojek.png
-│   │   ├── wordcloud_maxim.png
-│   │   ├── wordcloud_indrive.png
-│   │   ├── feature_gap_matrix.png
-│   │   └── switching_trigger_chart.png
-│   └── reports/
-│       └── executive_report.pdf             # Final report 10 halaman
+├── reports/
+│   └── figures/                        # 19 PNG visualisasi
+│       ├── 02_missing_values.png
+│       ├── 02_monthly_volume.png
+│       ├── 02_review_length.png
+│       ├── 02_review_per_platform.png
+│       ├── 02_score_distribution.png
+│       ├── 04_churn_signal.png
+│       ├── 04_monthly_trend.png
+│       ├── 04_pain_praise.png
+│       ├── 04_rating_nps.png
+│       ├── 04_reply_stats.png
+│       ├── 04_score_stacked.png
+│       ├── 04_top_keywords.png
+│       ├── 05_sentiment_heatmap.png
+│       ├── 05_sentiment_trend.png
+│       ├── 05_vader_sentiment.png
+│       ├── 06_churn_analysis.png
+│       ├── 06_competitive_summary.png
+│       ├── 06_feature_pain_matrix.png
+│       └── 06_radar_feature.png
 │
 ├── requirements.txt
 └── README.md
@@ -305,40 +328,41 @@ cd grab-ridehailing-competitive-analysis
 pip install -r requirements.txt
 ```
 
-### 3. Scraping data (opsional — data sudah tersedia di `data/raw/`)
+### 3. Jalankan pipeline secara berurutan
 
 ```bash
+# 01 — Scraping data (±30–40 menit, butuh koneksi stabil)
 jupyter notebook notebooks/01_data_collection.ipynb
+
+# 02 — Data understanding
+jupyter notebook notebooks/02_data_understanding.ipynb
+
+# 03 — Data cleaning
+jupyter notebook notebooks/03_data_cleaning.ipynb
+
+# 04 — EDA (termasuk churn signal detection)
+jupyter notebook notebooks/04_EDA.ipynb
+
+# 05 — Sentiment analysis VADER
+jupyter notebook notebooks/05_sentiment_analysis.ipynb
+
+# 06 — Competitive synthesis & recommendations
+jupyter notebook notebooks/06_competitive_synthesis.ipynb
 ```
 
-> ⚠️ Scraping ±1.000 review per platform (total 4.000 review) membutuhkan waktu ~15–20 menit. Data hasil scraping sudah disertakan di repo untuk kemudahan reproduksi.
-
-### 4. Jalankan pipeline secara berurutan
-
-```bash
-# Survey analysis
-jupyter notebook notebooks/02_survey_analysis.ipynb
-
-# Sentiment analysis & topic modeling
-jupyter notebook notebooks/03_sentiment_analysis.ipynb
-
-# Competitive synthesis & final output
-jupyter notebook notebooks/04_competitive_synthesis.ipynb
-```
+> ⚠️ Notebook 01 (scraping) membutuhkan waktu sekitar 30–40 menit untuk 4 platform. Data hasil scraping sudah tersedia di `data/raw/` sehingga kamu bisa skip notebook 01 dan langsung mulai dari notebook 02 jika sudah ada datanya.
 
 ### Requirements
 
 ```
 pandas>=2.0
 numpy>=1.24
-google-play-scraper>=1.2
-vaderSentiment>=3.3
-transformers>=4.35
-gensim>=4.3
 matplotlib>=3.7
 seaborn>=0.12
-wordcloud>=1.9
-plotly>=5.15
+google-play-scraper>=1.2
+vaderSentiment>=3.3
+pathlib
+collections
 jupyter>=1.0
 ```
 
@@ -348,30 +372,27 @@ jupyter>=1.0
 
 ### Limitations
 
-- **Sample bias:** Responden survei didominasi mahasiswa dan young professionals — tidak sepenuhnya representatif untuk segmen pekerja harian dan pengguna kota tier 3+, yang justru merupakan target utama Maxim dan inDrive.
-- **Maxim & inDrive data terbatas:** Riset akademis dan benchmark publik untuk Maxim dan inDrive jauh lebih sedikit dibandingkan Grab dan Gojek — angka market share tidak sepresisi dua platform besar.
-- **Review recency:** Data app review mencerminkan sentimen pada periode scraping — dapat bergeser seiring pembaruan aplikasi dan perubahan strategi promosi.
-- **No behavioral data:** Analisis berbasis persepsi dan self-reported behavior, bukan data transaksi aktual.
+- **VADER terbatas untuk teks Indonesia:** ~85% review terklasifikasi neutral karena VADER adalah lexicon English. Ini limitasi yang sudah diakui dan didokumentasikan di notebook 05. Star rating + keyword approach digunakan sebagai complement yang lebih valid.
+- **Hanya Google Play (Android):** Apple App Store scraping sudah disiapkan di notebook 01 namun tidak dieksekusi data iOS tidak termasuk. Mengingat penetrasi Android Indonesia >90% di segmen ride-hailing, ini acceptable.
+- **Tidak ada data survei primer:** Analisis sepenuhnya berbasis review app store (observed behavior, bukan stated preference). Switching trigger di sini adalah proxy dari review text, bukan konfirmasi langsung dari pengguna.
+- **Review recency:** Data diambil sorted by newest, namun tidak dibatasi rentang waktu spesifik, beberapa review mungkin berasal dari tahun berbeda dengan kondisi yang sudah berubah.
 
 ### Potential next steps
 
 | Ekstensi | Deskripsi |
 |---|---|
-| **Kota-level breakdown** | Analisis terpisah per kota untuk memahami apakah competitive gap Grab vs Maxim berbeda antara Jakarta dan Medan |
-| **Driver-side research** | Survei driver untuk memahami mengapa mereka beralih ke inDrive — ancaman supply yang lebih sulit dideteksi dari sisi rider |
-| **Price elasticity modeling** | Kuantifikasi seberapa besar perbedaan tarif Rp X mempengaruhi switching probability secara statistik |
-| **Longitudinal tracking** | Re-survey setiap 6 bulan untuk mengukur pergeseran market share persepsi seiring dinamika promo dan fitur baru |
+| **IndoBERT sentiment** | Ganti VADER dengan IndoBERT (HuggingFace) untuk akurasi sentimen bahasa Indonesia yang jauh lebih tinggi |
+| **Survei primer** | Tambahkan 100–150 responden survei untuk capture stated preference dan switching behavior yang tidak terdeteksi dari review |
+| **Topic modeling (LDA)** | Ekstrak topik otomatis dari review text untuk menemukan isu tersembunyi di luar keyword yang sudah didefinisikan |
+| **Temporal analysis per versi** | Hubungkan `reviewCreatedVersion` dengan changelog app untuk identifikasi versi mana yang memicu lonjakan review negatif |
+| **Geospatial breakdown** | Jika tersedia kota dalam review, pisahkan analisis per kota untuk lihat apakah competitive gap Grab vs Maxim berbeda antara Jakarta dan Medan |
 
 ---
 
 ## 📬 Contact
 
-**Devano Defrizal Yahdiyan Risyad**
-Final-year Computer Science · Universitas Pendidikan Indonesia · GPA 3.60/4.00
+**Defrizal Yahdiyan Risyad**
+Final-year Computer Science · Universitas Pendidikan Indonesia
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-defrizalyr-0A66C2?style=flat&logo=linkedin)](https://linkedin.com/in/defrizalyr)
 [![GitHub](https://img.shields.io/badge/GitHub-defrijay-181717?style=flat&logo=github)](https://github.com/defrijay)
-
----
-
-*Project ini dibuat sebagai bagian dari portofolio untuk aplikasi Grab Internship Program (GIP) 2026 — Research & Data Analytics.*
