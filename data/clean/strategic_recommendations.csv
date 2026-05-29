@@ -1,0 +1,6 @@
+Priority,Finding,Action,Expected Impact,Metric to Track
+P1,Pricing & ongkir is top pain point in negative reviews,Introduce dynamic voucher lock mechanism — vouchers should be guaranteed until expiry,Estimated 15-20% reduction in voucher-related churn complaints,% negative reviews mentioning 'voucher' / 'promo'
+P1,Refund/payment issues score highest in churn trigger analysis,Enforce 48-hour refund SLA with automated status notification to user,Reduce refund-related 1-star reviews by ~25%,Median refund resolution time; % refund complaints in reviews
+P2,App lag/crash mentioned frequently; Maxim users praise app speed,Prioritize app performance optimization for mid-range Android (RAM < 3GB),Improve NPS proxy by +5 to +10 points for budget device segment,Crash-free session rate; 'lag'/'lemot' keyword frequency
+P2,Driver cancellations are a recurring pain point vs InDrive,Implement driver penalty escalation for repeat same-day cancellations,Reduce cancellation-related reviews by ~20%,Cancellation rate per driver; 'batal'/'cancel' in reviews
+P3,Customer service responsiveness lags competitors in review replies,Personalize CS reply templates — avoid copy-paste generic responses,Improve reply sentiment; reduce follow-up 1-star reviews,Reply thumbs-up count; repeat 1-star rate after reply
